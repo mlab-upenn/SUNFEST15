@@ -1,4 +1,3 @@
-
 % clear the command line.
 clc
 % clear the workspace.
@@ -7,25 +6,25 @@ clear
 close all
 
 
-Data = csv2matPenn('1 _College_Hall_2.csv','College_Hall'); 
+Data = csv2matPenn('22_CRB_2.csv','CRB'); 
 Numdata = Data(2:end,1:end);
 Tabledata = cell2mat(Numdata);
 
-% indexes csv file for data and assigns it to variables 
-dom = Tabledata(2:11191,3);
-tod = Tabledata(2:11191,4);
-tempC = Tabledata(2:11191,5);
-sol = Tabledata(2:11191,9);
-occ = Tabledata(2:11191,15);
-mon = Tabledata(2:11191,2);
-winspeed = Tabledata(2:11191,10);
-windir = Tabledata(2:11191,12);
-gusts = Tabledata(2:11191,11);
-hum = Tabledata(2:11191,8);
-dew = Tabledata(2:11191,7);
-hdd = Tabledata(2:11191,13);
-cdd = Tabledata(2:11191,14);
-kw = Tabledata (2:11191,17);
+% indexes csv file for data 
+dom = Tabledata(2:end,3);
+tod = Tabledata(2:end,4);
+tempC = Tabledata(2:end,5);
+sol = Tabledata(2:end,9);
+occ = Tabledata(2:end,15);
+mon = Tabledata(2:end,2);
+winspeed = Tabledata(2:end,10);
+windir = Tabledata(2:end,12);
+gusts = Tabledata(2:end,11);
+hum = Tabledata(2:end,8);
+dew = Tabledata(2:end,7);
+hdd = Tabledata(2:end,13);
+cdd = Tabledata(2:end,14);
+kw = Tabledata (2:end,17);
 
 % contruct the feature matrix: columns of this matrix are the different
 % features and each row is one sample.
@@ -124,7 +123,7 @@ fprintf('Cross Validated Training RMSE(W): %.2f, R2: %.3f, RMSE/peak %.4f, NRMSD
     ,b,a,(b/max(college_hall_tree14.Y)),(100*b/(max(college_hall_tree14.Y)-min(college_hall_tree14.Y))));
 
 %% Random Forests
-disp('Learning a Random Forest...');
+ disp('Learning a Random Forest...');
 % leaf = [5 10 50 100];
 % col = 'rbcmyk';
 % figure();
@@ -148,7 +147,7 @@ disp('Learning a Random Forest...');
 % train a random forest with 500 trees.
 tic;
 B = TreeBagger(500,Xtrain,Ytrain,'Method','regression','OOBPred','On','OOBVarImp','On',...
-        'MinLeaf',minleaf);
+      'MinLeaf',minleaf);
 toc;
 
 % plot feature importance.
