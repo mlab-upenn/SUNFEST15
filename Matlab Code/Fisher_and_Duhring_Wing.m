@@ -6,7 +6,7 @@ clear
 close all
 
 
-Data = csv2matPenn('20_Fisher_and_Duhring_Wing_2.csv','Fisher_and_Duhring_Wing'); 
+Data = csv2matPenn('New_20_Fisher_and_Duhring_Wing_2.csv','Fisher_and_Duhring_Wing'); 
 Numdata = Data(2:end,1:end);
 Tabledata = cell2mat(Numdata);
 

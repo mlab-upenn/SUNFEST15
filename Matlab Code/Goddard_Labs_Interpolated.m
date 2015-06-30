@@ -6,25 +6,26 @@ clear
 close all
 
 
-Data = csv2matPenn('New_1 _Vance_Hall_2.csv','Vance_Hall'); 
+Data = csv2matPenn('15_Goddard_Labs_2.csv','Goddard_Labs'); 
 Numdata = Data(2:end,1:end);
 Tabledata = cell2mat(Numdata);
 
-% indexes csv file for data 
-dom = Tabledata(2:end,3);
-tod = Tabledata(2:end,4);
-tempC = Tabledata(2:end,5);
-sol = Tabledata(2:end,9);
-occ = Tabledata(2:end,15);
-mon = Tabledata(2:end,2);
-winspeed = Tabledata(2:end,10);
-windir = Tabledata(2:end,12);
-gusts = Tabledata(2:end,11);
-hum = Tabledata(2:end,8);
-dew = Tabledata(2:end,7);
-hdd = Tabledata(2:end,13);
-cdd = Tabledata(2:end,14);
-kw = Tabledata (2:end,17);
+% indexes csv file for data and assigns it to variables 
+dom = Tabledata(:,3);
+tod = Tabledata(:,4);
+tempC = Tabledata(:,5);
+sol = Tabledata(:,9);
+occ = Tabledata(:,15);
+mon = Tabledata(:,2);
+winspeed = Tabledata(:,10);
+windir = Tabledata(:,12);
+gusts = Tabledata(:,11);
+hum = Tabledata(:,8);
+dew = Tabledata(:,7);
+hdd = Tabledata(:,13);
+cdd = Tabledata(:,14);
+kw = Tabledata (:,17);
+
 
 % contruct the feature matrix: columns of this matrix are the different
 % features and each row is one sample.
@@ -44,7 +45,11 @@ sigmah = 2.5;
 sigmal = 2;
 % removes any points from X and Y where the values is outside of signalh
 % and sigmal standard deviation away from the mean.
-[X,Y,len,loss] = CleanXY(X,Y,sigmah,sigmal);
+[X,Y,len,loss] = newCleanXY(X,Y,sigmah,sigmal);
+
+% interpolates over 0s
+[iX,iY] = InterPenn (X,Y);
+
 
 % training length = 80% of the dataset. We will train on 80% of the data dn
 % use the remaining 20% for validation.
@@ -52,12 +57,12 @@ trlen = floor(0.8*len);
 
 % construct the training inputs. The traiing feature matrix and the
 % training response.
-Xtrain = X(1:trlen,:);
-Ytrain = Y(1:trlen);
+Xtrain = iX(1:trlen,:);
+Ytrain = iY(1:trlen);
 
 % store the remaining data as a test-set: test inputs and outputs.
-Xtest = X(trlen+1:end,:);
-Ytest = Y(trlen+1:end);
+Xtest = iX(trlen+1:end,:);
+Ytest = iY(trlen+1:end);
 
 % compute range and mean for the test set. this is used later to compute
 % goodness of fit.
@@ -80,7 +85,7 @@ disp('Learning Regression Tree...');
 
 % minimium number of leaf node observations. This is a stopping cirtera for
 % the recursive partitionioning algorithm used by the tree.
-minleaf = 5;  
+minleaf = 10;  
 
 % In Matlab, you can use tic and toc to measure the time elapsed between
 % different points in your code. Here we want to measure how much time does

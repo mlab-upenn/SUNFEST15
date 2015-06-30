@@ -6,7 +6,7 @@ clear
 close all
 
 
-Data = csv2matPenn('15_Goddard_Labs_2.csv','Goddard_Labs'); 
+Data = csv2matPenn('New_15_Goddard_Labs_2.csv','Goddard_Labs'); 
 Numdata = Data(2:end,1:end);
 Tabledata = cell2mat(Numdata);
 
