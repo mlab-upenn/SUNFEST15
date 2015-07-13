@@ -83,7 +83,11 @@ fprintf('The tree has %d leaf nodes \n',numleafs);
 [Yfit,node] = resubPredict(college_hall_tree14); 
 Y_mean = zeros(1,numleafs);
 
-TemporaryMean= college_hall_tree14.NodeMean;
+% Training Data that the tree uses
+%Different than Ytrain because does not use all data points to train model
+TreeY = college_hall_tree14.Y;
+TreeX = college_hall_tree14.X;
+
 for i=1:numleafs
     
     % find indices of nodes which end up in this leaf
@@ -94,11 +98,11 @@ for i=1:numleafs
     Y_mean(i) = ST(i).mean;
     % find the training samples which contribute to this leaf (support)
     
-    ST(i).xdata = {Xtrain(ST(i).leaves{1,1},:)};
+    ST(i).xdata = {TreeX(ST(i).leaves{1,1},:)};
     ST(i).xlength = length(cell2mat(ST(i).xdata));
     
     % find the training labels which contribute to this leaf
-    ST(i).ydata = {Ytrain(ST(i).leaves{1,1})};
+    ST(i).ydata = {TreeY(ST(i).leaves{1,1})};
     ST(i).ylength = length(cell2mat(ST(i).ydata));
     
     % finds the confidence interval for data points in each leaf
@@ -146,8 +150,8 @@ for j= 1:length(Data_index);
     leaf_number = Data_index(j); % leaf_number in the node number of the leaf 
     RelData_Points = cell2mat(ST(leaf_number).leaves);% array with Y data points in each leaf
     for jj = 1:length(RelData_Points);  %for loop that will iterate through each data point and take each feature 
-        Xtrain_index = RelData_Points(jj);% index of X data point
-        Train_row = Xtrain(Xtrain_index,:); % row taken from original Xtrain data with feature information
+        Xtree_index = RelData_Points(jj);% index of X data point
+        Train_row = TreeX(Xtree_index,:); % row taken from original Xtrain data with feature information
         
         % parses Xtrain data and creates data structure with feature
         % information for each data point in each leaf
@@ -221,7 +225,7 @@ end
    
     % Calculates support by dividing total data points in specified range
     % by total number of points in all training data 
-    Support = Total_Points ./ length(Xtrain);
+    Support = Total_Points ./ length(TreeX);
     
     %fprintf('Average day of month: %.2f, Average Time of day: %.2f, Average Temp(C): %.2f, Average Solar Radiation: %.2f, Average Occupancy: %.2f, Average Month: %.2f, Average Windspeed: %.2f, Avereage Windirection: %.2f, Average Gusts: %.2f,Average Humidity: %.2f, Average Dew Point: %.2f, Average Heating Days: %.2f, Average Cooling Days: %.2f \n\n' '
     
