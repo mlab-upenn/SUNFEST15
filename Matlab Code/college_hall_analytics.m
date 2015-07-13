@@ -79,10 +79,11 @@ leaf_index = find((college_hall_tree14.Children(:,1)==0)&(college_hall_tree14.Ch
 numleafs = length(leaf_index); % number of leaf nodes 
 fprintf('The tree has %d leaf nodes \n',numleafs);
 
-
-[Yfit,node] = resubPredict(college_hall_tree14);
+% returns node, which is the index of of training samples in each leaf
+[Yfit,node] = resubPredict(college_hall_tree14); 
 Y_mean = zeros(1,numleafs);
 
+TemporaryMean= college_hall_tree14.NodeMean;
 for i=1:numleafs
     
     % find indices of nodes which end up in this leaf
@@ -103,40 +104,53 @@ for i=1:numleafs
     % finds the confidence interval for data points in each leaf
     ydata_array = cell2mat(ST(i).ydata);
     SEM = std(ydata_array)/sqrt(length(ydata_array));
-    ts = tinv([.025 .095],length(ydata_array)-1);
+    ts = tinv([.025 .0975],length(ydata_array)-1);
     ST(i).CI = mean(ydata_array)+ ts*SEM;
 
 end
-
-Xaxis = linspace (1,numleafs,666);
+%Creates a Scatterplot with Y mean value at each leave on the X axis and
+% the leaf index on the Y axis
+Xaxis = linspace (1,numleafs,numleafs);
 Scatterplot = scatter(Y_mean,Xaxis,10);
 xlabel 'Y mean for each leaf';
 ylabel 'leaf index';
 
-%Specifiy Bin width
+%Specifiy Bin width by setting a range of Y values want to query
 Binwidth = 1;
-Y_Center = 50;
+Y_Center = 35; 
 Ymax = Y_Center+Binwidth ;
 Ymin= Y_Center-Binwidth ;
+
+%creates vector with zeros as long as the number of leafs 
+% Will add leafs that lie within specified Bin range
+% then remove extra zeros
 Data_index = zeros(1,numleafs);
 
+%Find the index of the leaf which are within specified Bin width and adds
+%them to Data_index
 for ii=1:numleafs
-    if (ST(ii).mean >= Ymin) && (ST(ii).mean <= Ymax);
-    Data_index(ii) = ii; % appending to list is time intensive 
+    if (ST(ii).mean >= Ymin) && (ST(ii).mean <= Ymax); 
+    Data_index(ii) = ii;  % vector with leafs that lie within 
     end
 end    
-
+%Removes zeros from Data_index, leaving only list with indeces of leafs
+%within range 
 Data_index = Data_index(Data_index ~= 0);
-    
+
+% scalar that will count the total number of data points in all the leafs
+% that lie within the specified bin range 
 Total_Points = 0;
 
+% loops through the vector with leafs
 for j= 1:length(Data_index);    
-    leaf_number = Data_index(j);
-    RelData_Points = cell2mat(ST(leaf_number).leaves);
-    for jj = 1:length(RelData_Points);  
-        Xtrain_index = RelData_Points(jj);
-        Train_row = Xtrain(Xtrain_index,:);
+    leaf_number = Data_index(j); % leaf_number in the node number of the leaf 
+    RelData_Points = cell2mat(ST(leaf_number).leaves);% array with Y data points in each leaf
+    for jj = 1:length(RelData_Points);  %for loop that will iterate through each data point and take each feature 
+        Xtrain_index = RelData_Points(jj);% index of X data point
+        Train_row = Xtrain(Xtrain_index,:); % row taken from original Xtrain data with feature information
         
+        % parses Xtrain data and creates data structure with feature
+        % information for each data point in each leaf
         Q.Leaf(j).Point(jj).dom = Train_row(1,1);
         Q.Leaf(j).Point(jj).tod = Train_row(1,2);
         Q.Leaf(j).Point(jj).tempC = Train_row(1,3);
@@ -151,11 +165,9 @@ for j= 1:length(Data_index);
         Q.Leaf(j).Point(jj).hdd = Train_row(1,12);
         Q.Leaf(j).Point(jj).cdd = Train_row(1,13);
         
-        Total_Points =  Total_Points + 1;
+        Total_Points =  Total_Points + 1; % Counts that total number of data points that the loop iterates through
     end   
 end
-
-
 
     TotalSum_dom = 0;
     TotalSum_tod = 0;
@@ -171,39 +183,47 @@ end
     TotalSum_hdd = 0;
     TotalSum_cdd = 0;
     
+%iterates through leaves and sums values for each feature
+% It is the total sum of values for each feature in data points that lie within the
+% specified bin range 
 for f= 1:length(Data_index);
 
     TotalSum_dom = sum([Q.Leaf(f).Point(:).dom]) + TotalSum_dom;
-    TotalSum_tod = Q.Leaf(j).Point(jj).tod + TotalSum_tod ; 
-    TotalSum_tempC = Q.Leaf(j).Point(jj).tempC + TotalSum_tempC ;
-    TotalSum_sol = Q.Leaf(j).Point(jj).sol + TotalSum_sol ;
-    TotalSum_occ = Q.Leaf(j).Point(jj).occ + TotalSum_occ;
-    TotalSum_mon = Q.Leaf(j).Point(jj).mon + TotalSum_mon ;
-    TotalSum_winspeed = Q.Leaf(j).Point(jj).winspeed + TotalSum_winspeed;
-    TotalSum_windir = Q.Leaf(j).Point(jj).windir + TotalSum_winspeed ; 
-    TotalSum_gusts = Q.Leaf(j).Point(jj).gusts + TotalSum_gusts ;
-    TotalSum_hum = Q.Leaf(j).Point(jj).hum +TotalSum_hum ; 
-    TotalSum_dew = Q.Leaf(j).Point(jj).dew + TotalSum_dew ;
-    TotalSum_hdd = Q.Leaf(j).Point(jj).hdd + TotalSum_hdd  ;
-    TotalSum_cdd = Q.Leaf(j).Point(jj).cdd + TotalSum_cdd ;
+    TotalSum_tod = sum([Q.Leaf(j).Point(:).tod]) + TotalSum_tod ; 
+    TotalSum_tempC = sum([Q.Leaf(j).Point(:).tempC]) + TotalSum_tempC ;
+    TotalSum_sol = sum([Q.Leaf(j).Point(:).sol]) + TotalSum_sol ;
+    TotalSum_occ = sum([Q.Leaf(j).Point(:).occ]) + TotalSum_occ;
+    TotalSum_mon = sum([Q.Leaf(j).Point(:).mon]) + TotalSum_mon ;
+    TotalSum_winspeed = sum([Q.Leaf(j).Point(:).winspeed]) + TotalSum_winspeed;
+    TotalSum_windir = sum([Q.Leaf(j).Point(:).windir]) + TotalSum_winspeed ; 
+    TotalSum_gusts = sum([Q.Leaf(j).Point(:).gusts]) + TotalSum_gusts ;
+    TotalSum_hum = sum([Q.Leaf(j).Point(:).hum]) +TotalSum_hum ; 
+    TotalSum_dew = sum([Q.Leaf(j).Point(:).dew]) + TotalSum_dew ;
+    TotalSum_hdd = sum([Q.Leaf(j).Point(:).hdd]) + TotalSum_hdd  ;
+    TotalSum_cdd = sum([Q.Leaf(j).Point(:).cdd]) + TotalSum_cdd ;
 end
 
-
-    avg_dom = TotalSum_dom / length(Total_Points)
-    avg_tod = TotalSum_tod / length(Total_Points)
-    avg_tempC = TotalSum_tempC / length(Total_Points)
-    avg_sol = TotalSum_sol / length(Total_Points)
-    avg_occ =  TotalSum_occ / length(Total_Points)
-    avg_mon =  TotalSum_mon / length(Total_Points)
-    avg_winspeed = TotalSum_winspeed / length(Total_Points)
-    avg_windir = TotalSum_windir / length(Total_Points)
-    avg_gusts = TotalSum_gusts / length(Total_Points)
-    avg_hum = TotalSum_hum / length(Total_Points)
-    avg_dew = TotalSum_dew / length(Total_Points)
-    avg_hdd = TotalSum_hdd / length(Total_Points)
-    avg_cdd = TotalSum_cdd / length(Total_Points)
+% Calculates average by diving the sum off features divided by
+% total number of data points that lie within the Bin
+    avg_dom = (TotalSum_dom ./ Total_Points)
+    avg_tod = (TotalSum_tod ./ Total_Points)
+    avg_tempC = (TotalSum_tempC ./ Total_Points)
+    avg_sol = (TotalSum_sol ./ Total_Points)
+    avg_occ =  (TotalSum_occ ./ Total_Points)
+    avg_mon =  (TotalSum_mon ./ Total_Points)
+    avg_winspeed = (TotalSum_winspeed ./ Total_Points)
+    avg_windir = (TotalSum_windir ./ Total_Points)
+    avg_gusts = (TotalSum_gusts ./ Total_Points)
+    avg_hum = (TotalSum_hum ./ Total_Points)
+    avg_dew = (TotalSum_dew ./ Total_Points)
+    avg_hdd = (TotalSum_hdd ./ Total_Points)
+    avg_cdd = (TotalSum_cdd ./ Total_Points)
    
-
+    % Calculates support by dividing total data points in specified range
+    % by total number of points in all training data 
+    Support = Total_Points ./ length(Xtrain);
+    
+    %fprintf('Average day of month: %.2f, Average Time of day: %.2f, Average Temp(C): %.2f, Average Solar Radiation: %.2f, Average Occupancy: %.2f, Average Month: %.2f, Average Windspeed: %.2f, Avereage Windirection: %.2f, Average Gusts: %.2f,Average Humidity: %.2f, Average Dew Point: %.2f, Average Heating Days: %.2f, Average Cooling Days: %.2f \n\n' '
     
 
 

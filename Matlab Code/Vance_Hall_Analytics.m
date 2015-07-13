@@ -82,6 +82,7 @@ fprintf('The tree has %d leaf nodes \n',numleafs);
 [Yfit,node] = resubPredict(college_hall_tree14); 
 Y_mean = zeros(1,numleafs);
 
+TemporaryMean= college_hall_tree14.NodeMean;
 for i=1:numleafs
     
     % find indices of nodes which end up in this leaf
@@ -102,44 +103,53 @@ for i=1:numleafs
     % finds the confidence interval for data points in each leaf
     ydata_array = cell2mat(ST(i).ydata);
     SEM = std(ydata_array)/sqrt(length(ydata_array));
-    ts = tinv([.025 .095],length(ydata_array)-1);
+    ts = tinv([.025 .0975],length(ydata_array)-1);
     ST(i).CI = mean(ydata_array)+ ts*SEM;
 
 end
-%Creates a Scatterplot with Predicted value at each leave on the X axis and
+%Creates a Scatterplot with Y mean value at each leave on the X axis and
 % the leaf index on the Y axis
 Xaxis = linspace (1,numleafs,numleafs);
 Scatterplot = scatter(Y_mean,Xaxis,10);
 xlabel 'Y mean for each leaf';
 ylabel 'leaf index';
 
-%Specifiy Bin width
+%Specifiy Bin width by setting a range of Y values want to query
 Binwidth = 1;
-Y_Center = 60;
+Y_Center = 35; 
 Ymax = Y_Center+Binwidth ;
 Ymin= Y_Center-Binwidth ;
+
+%creates vector with zeros as long as the number of leafs 
+% Will add leafs that lie within specified Bin range
+% then remove extra zeros
 Data_index = zeros(1,numleafs);
 
 %Find the index of the leaf which are within specified Bin width and adds
 %them to Data_index
 for ii=1:numleafs
-    if (ST(ii).mean >= Ymin) && (ST(ii).mean <= Ymax);
-    Data_index(ii) = ii; % appending to list is time intensive 
+    if (ST(ii).mean >= Ymin) && (ST(ii).mean <= Ymax); 
+    Data_index(ii) = ii;  % vector with leafs that lie within 
     end
 end    
 %Removes zeros from Data_index, leaving only list with indeces of leafs
 %within range 
 Data_index = Data_index(Data_index ~= 0);
-    
+
+% scalar that will count the total number of data points in all the leafs
+% that lie within the specified bin range 
 Total_Points = 0;
 
+% loops through the vector with leafs
 for j= 1:length(Data_index);    
-    leaf_number = Data_index(j); % leaf number in Data_index
-    RelData_Points = cell2mat(ST(leaf_number).leaves);% Cell with Y data points in each leaf
-    for jj = 1:length(RelData_Points);  
+    leaf_number = Data_index(j); % leaf_number in the node number of the leaf 
+    RelData_Points = cell2mat(ST(leaf_number).leaves);% array with Y data points in each leaf
+    for jj = 1:length(RelData_Points);  %for loop that will iterate through each data point and take each feature 
         Xtrain_index = RelData_Points(jj);% index of X data point
-        Train_row = Xtrain(Xtrain_index,:); % row containing features from Xtrain data 
+        Train_row = Xtrain(Xtrain_index,:); % row taken from original Xtrain data with feature information
         
+        % parses Xtrain data and creates data structure with feature
+        % information for each data point in each leaf
         Q.Leaf(j).Point(jj).dom = Train_row(1,1);
         Q.Leaf(j).Point(jj).tod = Train_row(1,2);
         Q.Leaf(j).Point(jj).tempC = Train_row(1,3);
@@ -154,7 +164,7 @@ for j= 1:length(Data_index);
         Q.Leaf(j).Point(jj).hdd = Train_row(1,12);
         Q.Leaf(j).Point(jj).cdd = Train_row(1,13);
         
-        Total_Points =  Total_Points + 1;
+        Total_Points =  Total_Points + 1; % Counts that total number of data points that the loop iterates through
     end   
 end
 
@@ -172,7 +182,9 @@ end
     TotalSum_hdd = 0;
     TotalSum_cdd = 0;
     
-%iterates through leaves and sums features for each data point
+%iterates through leaves and sums values for each feature
+% It is the total sum of values for each feature in data points that lie within the
+% specified bin range 
 for f= 1:length(Data_index);
 
     TotalSum_dom = sum([Q.Leaf(f).Point(:).dom]) + TotalSum_dom;
@@ -190,7 +202,7 @@ for f= 1:length(Data_index);
     TotalSum_cdd = sum([Q.Leaf(j).Point(:).cdd]) + TotalSum_cdd ;
 end
 
-% Calculates average by diving the sum off training features divided by
+% Calculates average by diving the sum off features divided by
 % total number of data points that lie within the Bin
     avg_dom = (TotalSum_dom ./ Total_Points)
     avg_tod = (TotalSum_tod ./ Total_Points)
@@ -206,4 +218,6 @@ end
     avg_hdd = (TotalSum_hdd ./ Total_Points)
     avg_cdd = (TotalSum_cdd ./ Total_Points)
    
+    % Calculates support by dividing total data points in specified range
+    % by total number of points in all training data 
     Support = Total_Points ./ length(Xtrain);
