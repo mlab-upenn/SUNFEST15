@@ -1,0 +1,35 @@
+StrategyIntent what is the recommended chilled water
+StrategyIntent tell me the recommended chilled water
+StrategyIntent get the recommended chilled water
+StrategyIntent give me the recommended chilled water
+StrategyIntent what is the chilled water
+StrategyIntent tell me the chilled water
+StrategyIntent give the chilled water
+StrategyIntent what is the chilled water 
+StrategyIntent recommend the chilled water
+ 
+RecommendIntent what is the best demand response
+RecommendIntent tell me the best demand response
+RecommendIntent get the best demand response
+RecommendIntent give me the best demand response
+RecommendIntent what is the demand resonse
+RecommendIntent tell me the demand response
+RecommendIntent give me the demand response 
+
+
+HelpIntent help
+HelpIntent help me
+HelpIntent what can I ask you
+HelpIntent get help
+HelpIntent to help
+HelpIntent to help me
+HelpIntent what commands can I ask
+HelpIntent what commands can I say
+HelpIntent what can I do
+HelpIntent what can I use this for
+HelpIntent what questions can I ask
+HelpIntent what can you do
+HelpIntent what do you do
+HelpIntent how do I use you
+HelpIntent how can I use you
+HelpIntent what can you tell me
