@@ -1,4 +1,4 @@
-function[Bin,tempC_figure,sol_figure,winspeed_figure,windir_figure,gusts_figure,hum_figure,dew_figure,cdd_figure,hdd_figure] = Analytics(building_csv, number_bins)
+function[Bin,Interval,Scatterplot,tempC_figure,sol_figure,winspeed_figure,windir_figure,gusts_figure,hum_figure,dew_figure,cdd_figure,hdd_figure] = Analytics(building_csv, number_bins)
 
 Data = csv2matPenn(building_csv,'College_Hall');
 Numdata = Data(2:end,1:end);
@@ -110,18 +110,16 @@ Scatterplot = scatter(Y_mean,Xaxis,10);
 xlabel 'Y mean for each leaf';
 ylabel 'leaf index';
 
-%Specifiy Bin width by setting a range of Y values want to query
-
+% Gets the range of the Y_means 
 Ymax = max(Y_mean);
 Ymin= min(Y_mean) ;
 
-
+% Divides the Y_axis by number_bins to create the number of bins that
+% the user specifies
 for r = 2:(number_bins);
+    Interval = (Ymax - Ymin) ./ number_bins;  %width of each bin   
     
-    
-    Interval = (Ymax - Ymin) ./ number_bins;     
-    
-    
+    %edges of each bin
     Ymin_interval.bin(1) = Ymin;
     Ymax_interval.bin(1) = Ymin_interval.bin(1) + Interval;
     Ymin_interval.bin(r) = Ymax_interval.bin(r-1);
@@ -131,6 +129,7 @@ for r = 2:(number_bins);
 
 end
 
+%at each iteration, creates box plots and calculates average values for data points within each bin 
 for h = 1:(number_bins); 
    
     
@@ -184,7 +183,7 @@ for h = 1:(number_bins);
                 Total_Points =  Total_Points + 1; % Counts that total number of data points that the loop iterates through
             end   
         end
-
+% Creates empty cells that will be filled with values of each feature
             Totalcell_dom = {};
             Totalcell_tod = {};
             TotalSum_tempC = 0;
@@ -212,6 +211,7 @@ for h = 1:(number_bins);
         %iterates through leaves and sums values for each feature
         % It is the total sum of values for each feature in data points that lie within the
         % specified bin range 
+        % Also adds all the values for each feature into a cell
         for f= 1:length(Data_index);
 
             Totalcell_dom = [Totalcell_dom,{Q.Leaf(f).Point(:).dom} ];
@@ -248,6 +248,7 @@ for h = 1:(number_bins);
             Totalcell_cdd = [Totalcell_cdd,{Q.Leaf(f).Point(:).cdd}];
         end
 
+        % Converts cells into arrays,
         TotalSum_domarray = cell2mat(Totalcell_dom);
         TotalSum_todarray = cell2mat(Totalcell_tod);
         TotalSum_occarray = cell2mat(Totalcell_occ);
@@ -263,64 +264,133 @@ for h = 1:(number_bins);
         TotalSum_array_hdd= cell2mat(Totalcell_hdd);
         TotalSum_array_cdd=cell2mat(Totalcell_cdd);
 
-        tempC_figure = figure();
-        subplot(number_bins/2,2,h);
-        boxplot(TotalSum_array_tempC);
-        sol_figure = figure();
-        subplot(number_bins/2,2,h);
-        boxplot(TotalSum_array_sol);
-        winspeed_figure = figure();
-        subplot(number_bins/2,2,h);
+        % Creates box plots for each feature in each bin
+        %Each figure contains one box plot for each bin for a given feature
+        tempC_figure = figure(1);
+        title 'TempC-Bin';
+        subplot(1,number_bins,h);
+         boxplot(TotalSum_array_tempC);
+         
+         
+         sol_figure = figure(2);
+         title('solar');
+        subplot(1,number_bins,h);
+         boxplot(TotalSum_array_sol);
+         
+        
+         winspeed_figure = figure(3);
+         title('winspeed');
+        subplot(1,number_bins,h);
         boxplot(TotalSum_array_winspeed);
-        windir_figure = figure();
-        subplot(number_bins/2,2,h);
+        
+        
+        windir_figure = figure(4);
+        title('windir');
+        subplot(1,number_bins,h);
         boxplot(TotalSum_array_windir);
-        gusts_figure = figure();
-        subplot(number_bins/2,2,h);
-        boxplot(TotalSum_array_gusts);
-        hum_figure = figure();
-        subplot(number_bins/2,2,h);
-        boxplot(TotalSum_array_hum);
-        dew_figure = figure();
-        subplot(number_bins/2,2,h);
-        boxplot(TotalSum_array_dew);
-        hdd_figure = figure();
-        subplot(number_bins/2,2,h);
-        boxplot(TotalSum_array_hdd);
-        cdd_figure = figure();
-        subplot(number_bins/2,2,h);
-        boxplot(TotalSum_array_cdd);
+        
+         
+        gusts_figure = figure(5);
+         title('gusts');
+        subplot(1,number_bins,h);
+         boxplot(TotalSum_array_gusts);
+        
+         
+         hum_figure = figure(6);
+          title('hum');
+        subplot(1,number_bins,h);
+          boxplot(TotalSum_array_hum);
+         
+         
+          dew_figure = figure(7);
+           title('dew');
+        subplot(1,number_bins,h);
+         boxplot(TotalSum_array_dew);
+        
+         
+         hdd_figure = figure(8);
+         title('hdd');
+        subplot(1,number_bins,h);
+         boxplot(TotalSum_array_hdd);
+         
+         cdd_figure = figure(9);
+         title('cdd');
+        subplot(1,number_bins,h);
+         boxplot(TotalSum_array_cdd);
+         
 
 
         for b=1:3;
             Most_dom.number(b) = mode(TotalSum_domarray);
-            TotalSum_dom = TotalSum_domarray(TotalSum_domarray ~= Most_dom.number(b));
+            TotalSum_domarray = TotalSum_domarray(TotalSum_domarray ~= Most_dom.number(b));
             Most_tod.number(b) = mode(TotalSum_todarray);
-            TotalSum_tod = TotalSum_todarray(TotalSum_todarray ~= Most_tod.number(b));
+            TotalSum_todarray = TotalSum_todarray(TotalSum_todarray ~= Most_tod.number(b));
             Most_occ.number(b) = mode(TotalSum_occarray);
-            TotalSum_occ = TotalSum_occarray(TotalSum_occarray ~= Most_occ.number(b));
+            TotalSum_occarray = TotalSum_occarray(TotalSum_occarray ~= Most_occ.number(b));
             Most_mon.number(b) = mode(TotalSum_monarray);
-            TotalSum_mon = TotalSum_monarray(TotalSum_monarray ~= Most_mon.number(b));
+            TotalSum_monarray = TotalSum_monarray(TotalSum_monarray ~= Most_mon.number(b));
         end
         % Calculates average by diving the sum off features divided by
         % total number of data points that lie within the Bin
-            Bin(h).dom_mode = [Most_dom.number(1),Most_dom.number(2),Most_dom.number(3)];
-            Bin(h).tod_mode= [Most_tod.number(1),Most_tod.number(2),Most_tod.number(3)];
+             Bin(h).dom_mode = [Most_dom.number(1),Most_dom.number(2),Most_dom.number(3)];
+            
+             Bin(h).tod_mode= [Most_tod.number(1),Most_tod.number(2),Most_tod.number(3)];
+            
              Bin(h).avg_tempC = (TotalSum_tempC ./ Total_Points);
-            Bin(h).avg_sol = (TotalSum_sol ./ Total_Points);
-             Bin(h).occ_mode = [Most_occ.number(1),Most_occ.number(2),Most_occ.number(3)];
-            Bin(h).mon_mode =  [Most_mon.number(1),Most_mon.number(2),Most_mon.number(3)];
+             SEM = std(TotalSum_array_tempC)/sqrt(length(TotalSum_array_tempC));
+             ts = tinv([.025 .0975],length(TotalSum_array_tempC)-1);
+             Bin(h).tempC_CI = mean(TotalSum_array_tempC)+ ts*SEM;
+            
+             Bin(h).avg_sol = (TotalSum_sol ./ Total_Points);
+             SEM = std(TotalSum_array_sol)/sqrt(length(TotalSum_array_sol));
+             ts = tinv([.025 .0975],length(TotalSum_array_sol)-1);
+             Bin(h).sol_CI  = mean(TotalSum_array_sol)+ ts*SEM;
+             
+             Bin(h).occ_mode = Most_occ.number(1);
+             
+             Bin(h).mon_mode =  [Most_mon.number(1),Most_mon.number(2),Most_mon.number(3)];
+             
              Bin(h).avg_winspeed = (TotalSum_winspeed ./ Total_Points);
-            Bin(h).avg_windir = (TotalSum_windir ./ Total_Points);
-            Bin(h).avg_gusts = (TotalSum_gusts ./ Total_Points);
+             SEM = std(TotalSum_array_winspeed)/sqrt(length(TotalSum_array_winspeed));
+             ts = tinv([.025 .0975],length(TotalSum_array_winspeed)-1);
+             Bin(h).winspeed_CI = mean(TotalSum_array_winspeed)+ ts*SEM;
+             
+             Bin(h).avg_windir = (TotalSum_windir ./ Total_Points);
+             SEM = std(TotalSum_array_windir)/sqrt(length(TotalSum_array_windir));
+             ts = tinv([.025 .0975],length(TotalSum_array_windir)-1);
+             Bin(h).windir_CI = mean(TotalSum_array_windir)+ ts*SEM;
+             
+             Bin(h).avg_gusts = (TotalSum_gusts ./ Total_Points);
+             SEM = std(TotalSum_array_gusts)/sqrt(length(TotalSum_array_gusts));
+             ts = tinv([.025 .0975],length(TotalSum_array_gusts)-1);
+             Bin(h).gusts_CI = mean(TotalSum_array_gusts)+ ts*SEM;
+             
              Bin(h).avg_hum = (TotalSum_hum ./ Total_Points); 
-            Bin(h).avg_dew = (TotalSum_dew ./ Total_Points);
-            Bin(h).avg_hdd = (TotalSum_hdd ./ Total_Points);
+             SEM = std(TotalSum_array_tempC)/sqrt(length(TotalSum_array_tempC));
+             ts = tinv([.025 .0975],length(TotalSum_array_tempC)-1);
+             Bin(h).hum_CI = mean(TotalSum_array_tempC)+ ts*SEM;
+             
+             Bin(h).avg_dew = (TotalSum_dew ./ Total_Points);
+             SEM = std(TotalSum_array_dew)/sqrt(length(TotalSum_array_dew));
+             ts = tinv([.025 .0975],length(TotalSum_array_dew)-1);
+             Bin(h).dew_CI = mean(TotalSum_array_dew)+ ts*SEM;
+             
+             Bin(h).avg_hdd = (TotalSum_hdd ./ Total_Points);
+             SEM = std(TotalSum_array_hdd)/sqrt(length(TotalSum_array_hdd));
+             ts = tinv([.025 .0975],length(TotalSum_array_hdd)-1);
+             Bin(h).hdd_CI = mean(TotalSum_array_hdd)+ ts*SEM;
+             
              Bin(h).avg_cdd = (TotalSum_cdd ./ Total_Points);
-
-            % Calculates support by dividing total data points in specified range
+             SEM = std(TotalSum_array_cdd)/sqrt(length(TotalSum_array_cdd));
+             ts = tinv([.025 .0975],length(TotalSum_array_cdd)-1);
+             Bin(h).cdd_CI = mean(TotalSum_array_cdd)+ ts*SEM;
+            
+             
+             % Calculates support by dividing total data points in specified range
             % by total number of points in all training data 
             Bin(h).support = Total_Points ./ length(TreeX);
+            
+           
 
         
         
