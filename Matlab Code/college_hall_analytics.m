@@ -90,7 +90,7 @@ TreeX = college_hall_tree14.X;
 
 for i=1:numleafs
     
-    % find indices of nodes which end up in this leaf
+    % find indices of samples which end up in this leaf
     ST(i).leaves = {find(node==leaf_index(i))};
     
     % prediction at the leaf
@@ -120,7 +120,7 @@ xlabel 'Y mean for each leaf';
 ylabel 'leaf index';
 
 %Specifiy Bin width by setting a range of Y values want to query
-Binwidth = 1;
+Binwidth = 5;
 Y_Center = 35; 
 Ymax = Y_Center+Binwidth ;
 Ymin= Y_Center-Binwidth ;
@@ -160,8 +160,8 @@ for j= 1:length(Data_index);
         Q.Leaf(j).Point(jj).tempC = Train_row(1,3);
         Q.Leaf(j).Point(jj).sol = Train_row(1,4);
         Q.Leaf(j).Point(jj).occ = Train_row(1,5);
-        Q.Leaf(j).Point(jj).mon = Train_row(1,5); 
-        Q.Leaf(j).Point(jj).winspeed = Train_row(1,6);
+        Q.Leaf(j).Point(jj).mon = Train_row(1,6);   % fix index on git
+        Q.Leaf(j).Point(jj).winspeed = Train_row(1,7);
         Q.Leaf(j).Point(jj).windir = Train_row(1,8);
         Q.Leaf(j).Point(jj).gusts = Train_row(1,9);
         Q.Leaf(j).Point(jj).hum = Train_row(1,10);
