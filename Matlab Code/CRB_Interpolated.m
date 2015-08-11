@@ -69,16 +69,16 @@ Ytest = iY(trlen+1:end);
 range = max(Ytest)-min(Ytest);
 bar = mean(Ytest);
 
-% plot the training data features.
-figure();
-for jj=1:length(colnames);
-    
-    subplot(ceil(length(colnames)/2),2,jj);
-    plot(Xtrain(:,jj));
-    str = colnames(jj);
-    title(str);
-    grid on;
-end
+% % plot the training data features.
+% figure();
+% for jj=1:length(colnames);
+%     
+%     subplot(ceil(length(colnames)/2),2,jj);
+%     plot(Xtrain(:,jj));
+%     str = colnames(jj);
+%     title(str);
+%     grid on;
+% end
 
  %% Start Tree Regression
 disp('Learning Regression Tree...');
@@ -155,12 +155,12 @@ B = TreeBagger(500,Xtrain,Ytrain,'Method','regression','OOBPred','On','OOBVarImp
       'MinLeaf',minleaf);
 toc;
 
-% plot feature importance.
-figure();
-barh(B.OOBPermutedVarDeltaError);
-xlabel 'Feature' ;
-ylabel 'Out-of-Bag Feature Importance';
-set(gca,'YTickLabel',colnames);
+% % plot feature importance.
+% figure();
+% barh(B.OOBPermutedVarDeltaError);
+% xlabel 'Feature' ;
+% ylabel 'Out-of-Bag Feature Importance';
+% set(gca,'YTickLabel',colnames);
 
 % figure();
 % plot(sqrt(oobError(B)));
@@ -177,15 +177,15 @@ fprintf('Random Forests Training RMSE(W): %.2f, R2: %.3f, RMSE/peak %0.4f, NRMSD
 %%
 
 % plot the prediction performance on the training data for all the methods.
-figure;
-plot(college_hall_tree14.Y), hold on
-plot(Yfit,'y');
-plot(YfitCV,'r');
-plot(Ybag,'c');
-grid on;
-legend('Ground Truth','Single Tree','CV Tree','Forest');
-title('Training');
-hold off;
+% figure;
+% plot(college_hall_tree14.Y), hold on
+% plot(Yfit,'y');
+% plot(YfitCV,'r');
+% plot(Ybag,'c');
+% grid on;
+% legend('Ground Truth','Single Tree','CV Tree','Forest');
+% title('Training');
+% hold off;
 
 % now obtian prediction ont he test set. This is really the value we care
 % about since we are evaluationg thwe prediction performance on data that
@@ -221,10 +221,12 @@ fprintf('RF (Testing) RMSE(W): %.2f, R2: %.3f, RMSE/peak %.4f, NRMSD: %0.2f \n\n
 figure;
 plot(Ytest), hold on
 axis([0 length(Ytest) 0 max(Ytest)+20]);
-plot(Ypredict,'y');
-plot(YpredictCV,'r');
+%plot(Ypredict,'y');
+%plot(YpredictCV,'r');
 plot(Ybagt,'c');
-legend('Ground Truth','Single','CV','Forest');
+%legend('Ground Truth','Single','CV','Forest');
 title('2015');
 grid on;
 hold off;
+
+fig2plotly()

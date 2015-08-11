@@ -204,7 +204,7 @@ for h = 1:(number_bins);
         tempC_figure = figure(1);
         subplot(1,number_bins,h);
         xlabel('bin(h)');
-        ylabel(Temperature(C));
+        ylabel('Temperature(C)');
         boxplot(TotalSum_array_tempC);
          
          
