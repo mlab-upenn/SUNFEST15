@@ -70,7 +70,7 @@ range = max(Ytest)-min(Ytest);
 bar = mean(Ytest);
 
 % plot the training data features.
-figure();
+figure(11);
 for jj=1:length(colnames);
     
     subplot(ceil(length(colnames)/2),2,jj);
@@ -107,7 +107,7 @@ fprintf('Training RMSE(W): %.2f, R2: %.3f, RMSE/peak: %.4f, NRMSD: %.2f \n\n'...
     ,b,a,(b/max(college_hall_tree14.Y)),(100*b/(max(college_hall_tree14.Y)-min(college_hall_tree14.Y))));
 
 
- AnalyticsFunction (college_hall_tree14,5);
+ [Bin,ST,Interval]= AnalyticsFunction (college_hall_tree14,5);
 
 
 %% Improve the tree by using k-fold cross validation
