@@ -6,7 +6,7 @@ clear
 close all
 
 
-Data = csv2matPenn('1 _College_Hall_2.csv','College_Hall'); 
+Data = csv2matPenn('1_College_Hall_2.csv','College_Hall');  
 Numdata = Data(2:end,1:end);
 Tabledata = cell2mat(Numdata);
 
