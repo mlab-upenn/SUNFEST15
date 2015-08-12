@@ -1,4 +1,4 @@
- function[Bin,ST,Interval,Scatterplot,tempC_figure,sol_figure,winspeed_figure,windir_figure,gusts_figure,hum_figure,dew_figure,cdd_figure,hdd_figure] = AnalyticsFunction(Tree, number_bins)
+ function[Bin,ST,Interval] = AnalyticsFunction(Tree, number_bins)
 
 leaf_index = find((Tree.Children(:,1)==0)&(Tree.Children(:,2)==0)); % index of node that is a leaf
 numleafs = length(leaf_index); % number of leaf nodes 
@@ -32,13 +32,13 @@ for i=1:numleafs
     
     % finds the confidence interval for data points in each leaf
     ydata_array = cell2mat(ST(i).ydata);
-    SEM = std(ydata_array)/sqrt(length(ydata_array));
-    ts = tinv([.025 .0975],length(ydata_array)-1);
-    ST(i).CI = mean(ydata_array)+ ts*SEM;
+    ts = ([-2 2]);
+    ST(i).CI = mean(ydata_array)+ ts;
 
 end
 %Creates a Scatterplot with Y mean value at each leave on the X axis and
 % the leaf index on the Y axis
+figure(1)
 Xaxis = linspace (1,numleafs,numleafs);
 Scatterplot = scatter(Y_mean,Xaxis,10);
 xlabel 'Y mean for each leaf';
@@ -201,50 +201,49 @@ for h = 1:(number_bins);
         % Creates box plots for each feature in each bin
         %Each figure contains one box plot for each bin for a given feature
         
-        tempC_figure = figure(1);
+        tempC_figure = figure(2);
         subplot(1,number_bins,h);
-        xlabel('bin(h)');
-        ylabel('Temperature(C)');
-        boxplot(TotalSum_array_tempC);
+        boxplot(TotalSum_array_tempC,'labels',sprintf('%.0f - %.0f', Ymin_interval.bin(h), Ymax_interval.bin(h)));
+       
          
          
-         sol_figure = figure(2);
+         sol_figure = figure(3);
          subplot(1,number_bins,h);
-         boxplot(TotalSum_array_sol);
+         boxplot(TotalSum_array_sol,'labels',sprintf('%.0f - %.0f', Ymin_interval.bin(h), Ymax_interval.bin(h)));
          
         
-         winspeed_figure = figure(3);
+         winspeed_figure = figure(4);
         subplot(1,number_bins,h);
-        boxplot(TotalSum_array_winspeed);
+        boxplot(TotalSum_array_winspeed,'labels',sprintf('%.0f - %.0f', Ymin_interval.bin(h), Ymax_interval.bin(h)));
         
         
-        windir_figure = figure(4);
+        windir_figure = figure(5);
         subplot(1,number_bins,h);
-        boxplot(TotalSum_array_windir);
+        boxplot(TotalSum_array_windir,'labels',sprintf('%.0f - %.0f', Ymin_interval.bin(h), Ymax_interval.bin(h)));
         
          
-        gusts_figure = figure(5);
+        gusts_figure = figure(6);
          subplot(1,number_bins,h);
-         boxplot(TotalSum_array_gusts);
+         boxplot(TotalSum_array_gusts,'labels',sprintf('%.1f - %.1f', Ymin_interval.bin(h), Ymax_interval.bin(h)));
         
          
-         hum_figure = figure(6);
+         hum_figure = figure(7);
          subplot(1,number_bins,h);
-          boxplot(TotalSum_array_hum);
+          boxplot(TotalSum_array_hum,'labels',sprintf('%.0f - %.0f', Ymin_interval.bin(h), Ymax_interval.bin(h)));
          
          
-          dew_figure = figure(7);
+          dew_figure = figure(8);
            subplot(1,number_bins,h);
-         boxplot(TotalSum_array_dew);
+         boxplot(TotalSum_array_dew,'labels',sprintf('%.0f - %.0f', Ymin_interval.bin(h), Ymax_interval.bin(h)));
         
          
-         hdd_figure = figure(8);
+         hdd_figure = figure(9);
         subplot(1,number_bins,h);
-         boxplot(TotalSum_array_hdd);
+         boxplot(TotalSum_array_hdd,'labels',sprintf('%.0f - %.0f', Ymin_interval.bin(h), Ymax_interval.bin(h)));
          
-         cdd_figure = figure(9);
+         cdd_figure = figure(10);
           subplot(1,number_bins,h);
-         boxplot(TotalSum_array_cdd);
+         boxplot(TotalSum_array_cdd,'labels',sprintf('%.0f - %.0f', Ymin_interval.bin(h), Ymax_interval.bin(h)));
          
 
 
@@ -265,56 +264,48 @@ for h = 1:(number_bins);
              Bin(h).tod_mode= [Most_tod.number(1),Most_tod.number(2),Most_tod.number(3)];
             
              Bin(h).avg_tempC = (TotalSum_tempC ./ Total_Points);
-             SEM = std(TotalSum_array_tempC)/sqrt(length(TotalSum_array_tempC));
-             ts = tinv([.025 .0975],length(TotalSum_array_tempC)-1);
-             Bin(h).tempC_CI = mean(TotalSum_array_tempC)+ ts*SEM;
+             ts = ([-2 2]);
+             Bin(h).tempC_CI = mean(TotalSum_array_tempC)+ ts;
             
              Bin(h).avg_sol = (TotalSum_sol ./ Total_Points);
-             SEM = std(TotalSum_array_sol)/sqrt(length(TotalSum_array_sol));
-             ts = tinv([.025 .0975],length(TotalSum_array_sol)-1);
-             Bin(h).sol_CI  = mean(TotalSum_array_sol)+ ts*SEM;
+             ts = ([-2 2]);
+             Bin(h).sol_CI  = mean(TotalSum_array_sol)+ ts;
              
              Bin(h).occ_mode = Most_occ.number(1);
              
              Bin(h).mon_mode =  [Most_mon.number(1),Most_mon.number(2),Most_mon.number(3)];
              
              Bin(h).avg_winspeed = (TotalSum_winspeed ./ Total_Points);
-             SEM = std(TotalSum_array_winspeed)/sqrt(length(TotalSum_array_winspeed));
-             ts = tinv([.025 .0975],length(TotalSum_array_winspeed)-1);
-             Bin(h).winspeed_CI = mean(TotalSum_array_winspeed)+ ts*SEM;
+             ts = ([-2 2]);
+             Bin(h).winspeed_CI = mean(TotalSum_array_winspeed)+ ts;
              
              Bin(h).avg_windir = (TotalSum_windir ./ Total_Points);
-             SEM = std(TotalSum_array_windir)/sqrt(length(TotalSum_array_windir));
-             ts = tinv([.025 .0975],length(TotalSum_array_windir)-1);
-             Bin(h).windir_CI = mean(TotalSum_array_windir)+ ts*SEM;
+             ts = ([-2 2]);
+             Bin(h).windir_CI = mean(TotalSum_array_windir)+ ts;
              
              Bin(h).avg_gusts = (TotalSum_gusts ./ Total_Points);
-             SEM = std(TotalSum_array_gusts)/sqrt(length(TotalSum_array_gusts));
-             ts = tinv([.025 .0975],length(TotalSum_array_gusts)-1);
-             Bin(h).gusts_CI = mean(TotalSum_array_gusts)+ ts*SEM;
+             ts =([-2 2]);
+             Bin(h).gusts_CI = mean(TotalSum_array_gusts)+ ts;
              
              Bin(h).avg_hum = (TotalSum_hum ./ Total_Points); 
-             SEM = std(TotalSum_array_tempC)/sqrt(length(TotalSum_array_tempC));
-             ts = tinv([.025 .0975],length(TotalSum_array_tempC)-1);
-             Bin(h).hum_CI = mean(TotalSum_array_tempC)+ ts*SEM;
+             ts = ([-2 2]);
+             Bin(h).hum_CI = mean(TotalSum_array_tempC)+ ts;
              
              Bin(h).avg_dew = (TotalSum_dew ./ Total_Points);
-             SEM = std(TotalSum_array_dew)/sqrt(length(TotalSum_array_dew));
-             ts = tinv([.025 .0975],length(TotalSum_array_dew)-1);
-             Bin(h).dew_CI = mean(TotalSum_array_dew)+ ts*SEM;
+             ts = ([-2 2]);
+             Bin(h).dew_CI = mean(TotalSum_array_dew)+ ts;
              
              Bin(h).avg_hdd = (TotalSum_hdd ./ Total_Points);
-             SEM = std(TotalSum_array_hdd)/sqrt(length(TotalSum_array_hdd));
-             ts = tinv([.025 .0975],length(TotalSum_array_hdd)-1);
-             Bin(h).hdd_CI = mean(TotalSum_array_hdd)+ ts*SEM;
+             ts = ([-2 2]);
+             Bin(h).hdd_CI = mean(TotalSum_array_hdd)+ ts;
              
              Bin(h).avg_cdd = (TotalSum_cdd ./ Total_Points);
-             SEM = std(TotalSum_array_cdd)/sqrt(length(TotalSum_array_cdd));
-             ts = tinv([.025 .0975],length(TotalSum_array_cdd)-1);
-             Bin(h).cdd_CI = mean(TotalSum_array_cdd)+ ts*SEM;
+            
+             ts = ([-2 2]);
+             Bin(h).cdd_CI = mean(TotalSum_array_cdd)+ ts;
             
              
-             % Calculates support by dividing total data points in specified range
+            % Calculates support by dividing total data points in specified range
             % by total number of points in all training data 
             Bin(h).support = Total_Points ./ length(TreeX);
             
@@ -322,57 +313,125 @@ for h = 1:(number_bins);
         
 end
 
-figure(1)
+figure(2)
             annotation('textbox', [0 0.9 1 0.1], ...
             'String', 'Temp-C', ...
             'EdgeColor', 'none', ...
             'HorizontalAlignment', 'center')
+        annotation('textbox', [0 0 1 .05], ...
+            'String', 'kW', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center','Fontsize',12)   
+          annotation('textbox', [0 .5 1 0.1], ...
+            'String', '°C', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'left','Fontsize',12)  
         
-figure(2)
+figure(3)
           annotation('textbox', [0 0.9 1 0.1], ...
             'String', 'SOLAR', ...
             'EdgeColor', 'none', ...
             'HorizontalAlignment', 'center')
+        annotation('textbox', [0 0 1 .05], ...
+            'String', 'kW', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center','Fontsize',12)   
+          annotation('textbox', [0 .5 1 0.1], ...
+            'String', 'W/M^2', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'left','Fontsize',12)  
          
 
-figure(3)
+figure(4)
          annotation('textbox', [0 0.9 1 0.1], ...
             'String', 'WINSPEED', ...
             'EdgeColor', 'none', ...
             'HorizontalAlignment', 'center')
-        
-
-figure(4)
+        annotation('textbox', [0 0 1 0.05], ...
+            'String', 'kW', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center','Fontsize',12)   
+         annotation('textbox', [0 .5 1 0.1], ...
+            'String', 'MPH', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'left','Fontsize',12)  
+figure(5)
          annotation('textbox', [0 0.9 1 0.1], ...
             'String', 'WINDIR', ...
             'EdgeColor', 'none', ...
             'HorizontalAlignment', 'center')
+        annotation('textbox', [0 0 1 0.05], ...
+            'String', 'kW', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center','Fontsize',12)   
+          annotation('textbox', [0 .5 1 0.1], ...
+            'String', 'Direc', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'left','Fontsize',12)  
          
-
-figure(5)
-          annotation('textbox', [0 0.9 1 0.1], ...
-            'String', 'WINSPEED', ...
+figure(6)
+        annotation('textbox', [0 0.9 1 0.1], ...
+            'String', 'Gusts', ...
             'EdgeColor', 'none', ...
             'HorizontalAlignment', 'center')
-
-figure(6)
-           annotation('textbox', [0 0.9 1 0.1], ...
+    annotation('textbox', [0 0 1 0.05], ...
+            'String', 'kW', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center','Fontsize',12)   
+         annotation('textbox', [0 .5 1 0.1], ...
+            'String', '', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'left','Fontsize',12)  
+figure(7)
+         annotation('textbox', [0 0.9 1 0.1], ...
             'String', 'HUMIDITY', ...
             'EdgeColor', 'none', ...
             'HorizontalAlignment', 'center')
-figure(7)
-         annotation('textbox', [0 0.9 1 0.1], ...
+        annotation('textbox', [0 0 1 0.05], ...
+            'String', 'kW', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center','Fontsize',12)   
+         annotation('textbox', [0 .5 1 0.1], ...
+            'String', '%', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'left','Fontsize',12)  
+figure(8)
+          annotation('textbox', [0 0.9 1 0.1], ...
             'String', 'DEW', ...
             'EdgeColor', 'none', ...
             'HorizontalAlignment', 'center')
-figure(8)
+        annotation('textbox', [0 0 1 0.05], ...
+            'String', 'kW', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center','Fontsize',12)   
+         annotation('textbox', [0 .5 1 0.1], ...
+            'String', '%', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'left','Fontsize',12)  
+figure(9)
          annotation('textbox', [0 0.9 1 0.1], ...
             'String', 'HDD', ...
             'EdgeColor', 'none', ...
             'HorizontalAlignment', 'center')
+        annotation('textbox', [0 0 1 0.05], ...
+            'String', 'kW', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center','Fontsize',12)   
+          annotation('textbox', [0 .5 1 0.1], ...
+            'String', 'Days', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'left','Fontsize',12)  
          
-figure(9)
+figure(10)
       annotation('textbox', [0 0.9 1 0.1], ...
             'String', 'CDD', ...
             'EdgeColor', 'none', ...
             'HorizontalAlignment', 'center')
+      annotation('textbox', [0 0 1 0.05], ...
+            'String', 'kW', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'center','Fontsize',12)   
+      annotation('textbox', [0 .5 1 0.1], ...
+            'String', 'Days', ...
+            'EdgeColor', 'none', ...
+            'HorizontalAlignment', 'left','Fontsize',12)  
