@@ -80,6 +80,8 @@ for jj=1:length(colnames);
     grid on;
 end
 
+
+
  %% Start Tree Regression
 disp('Learning Regression Tree...');
 
@@ -146,26 +148,54 @@ toc;
 EnsembletrainX = BaggedEnsemble.X;
 EnsembletrainY = BaggedEnsemble.Y;
 
+% Gets the range of the Y_means 
+Ymax = max(BaggedEnsemble.Y);
+Ymin= min(BaggedEnsemble.Y) ;
 
-%% Loop through each tree in ensemble, get nodes of training data, and calls analytics function
-
+%number of bins
 bins = 5;
 
+
+% Divides the Y_axis by number_bins to create the number of bins that
+% the user specifies
+for r = 2:(bins);
+    
+    
+    Interval = (Ymax - Ymin) ./ bins;  %width of each bin   
+    
+    %edges of each bin
+    Ymin_interval.bin(1) = Ymin;
+    Ymax_interval.bin(1) = Ymin_interval.bin(1) + Interval;
+    Ymin_interval.bin(r) = Ymax_interval.bin(r-1);
+    Ymax_interval.bin(r) = Ymin_interval.bin(r) + Interval ;
+
+    
+end
+
+
+%blank array where node index will be stored for each data sample
 treeNodes = zeros(size(EnsembletrainX,1),length(BaggedEnsemble.Trees));
+
+%%Loops through each tree in ensemble, gets nodes of training data, and
+%%calls analytics function. 
 for iTree = 1:length(BaggedEnsemble.Trees)
     [ Yfit , treeNodes(:,iTree)] = predict(BaggedEnsemble.Trees{iTree},EnsembletrainX);
 
-ForestTree = BaggedEnsemble.Trees{1,iTree};
+ForestTree = BaggedEnsemble.Trees{1,iTree};% List of all of the trees in the ensemble. Each tree is an object of the CompactRegression tree class
 
-[ST,Ymin_interval,Ymax_interval,Total_PointsStr,T] = ForestAnalyticsFunction (ForestTree,treeNodes(:,iTree),EnsembletrainX,EnsembletrainY,bins);
-EnsembleTree.TreeNumber(iTree).T = T ;
+
+[ST,Total_PointsStr,T] = ForestAnalyticsFunction (ForestTree,treeNodes(:,iTree),EnsembletrainX,EnsembletrainY,bins,Ymin_interval,Ymax_interval); 
+
+% Add training feature information for each tree into a global structure
+EnsembleTree.TreeNumber(iTree).T = T ; 
 EnsembleTree.TreeNumber(iTree).ST = ST;
 EnsembleTree.TreeNumber(iTree).Total_PointsStr = Total_PointsStr;
-EnsembleTree.TreeNumber(iTree).Ymin_interval = Ymin_interval;
-EnsembleTree.TreeNumber(iTree).Ymax_interval = Ymax_interval;
 end
 
-[Bin] = ForestPlot((length(BaggedEnsemble.Trees)),EnsembleTree,bins, EnsembletrainX);
+% Global structure containing feature information for all of the trees in
+% the ensemble as well as the intervals is passed into plotting function,
+% which makes box plots for each bin
+[Bin] = ForestPlot((length(BaggedEnsemble.Trees)),EnsembleTree,bins, EnsembletrainX,Ymin_interval,Ymax_interval);
 
 % plot feature importance.
 figure();

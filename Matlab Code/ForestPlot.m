@@ -1,4 +1,4 @@
-function[Bin] = ForestPlot(NumberTrees,EnsembleTree,number_bins,EnsembletrainX)
+function[Bin] = ForestPlot(NumberTrees,EnsembleTree,number_bins,EnsembletrainX,Ymin_interval,Ymax_interval)
 
 
 for h = 1:number_bins;
@@ -72,7 +72,6 @@ for h = 1:number_bins;
             EnsembleTotalSum_cdd = sum([EnsembleTree.TreeNumber(i).T.bin(h).TotalSum_array_cdd]) + EnsembleTotalSum_cdd ;
             EnsembleTotalcell_cdd = [EnsembleTotalcell_cdd,{EnsembleTree.TreeNumber(i).T.bin(h).TotalSum_array_cdd}];
              
-
             Total_Points = sum(EnsembleTree.TreeNumber(i).Total_PointsStr.bin(1,h) + (Total_Points));
             
                 
@@ -124,7 +123,7 @@ for h = 1:number_bins;
          
         gusts_figure = figure(6);
          subplot(1,number_bins,h);
-         boxplot(TotalSum_array_gusts,'labels',sprintf('%.1f - %.1f', Ymin_interval.bin(h), Ymax_interval.bin(h)));
+         boxplot(TotalSum_array_gusts,'labels',sprintf('%.0f - %.0f', Ymin_interval.bin(h), Ymax_interval.bin(h)));
         
          
          hum_figure = figure(7);
