@@ -1,0 +1,23 @@
+Column Descriptions:
+
+1) year
+2) month
+3) day of month
+4) hour of day
+5) Outside Air Temp (C)
+6) Outside Air Temp (F)
+7) DewPoint
+8) Relative Humidity
+9) Incident Solar Radiation
+10) Wind Speed
+11) Gusts Speed
+12) Wind Direction
+13) HDD: Heating Degree Days
+14) CDD: Cooling Degree Days
+15) Occupancy
+16) Building Area
+17) Value
+
+The "5" in the file name means steam demand, "6" means chilled water demand, and "2" means electricity demand.
+
+test edit
